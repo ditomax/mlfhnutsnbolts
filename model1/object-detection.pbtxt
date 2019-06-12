@@ -1,0 +1,16 @@
+item {
+  id: 1
+  name: 'bolt'
+} 
+item {
+  id: 2
+  name: 'nut'
+}
+item {
+  id: 3
+  name: 'washer'
+}
+item {
+  id: 4
+  name: 'lockwasher'
+}
