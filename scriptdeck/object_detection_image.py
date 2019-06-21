@@ -12,7 +12,11 @@ from pathlib import Path
 
 from collections import defaultdict
 from io import StringIO
+
+import matplotlib
 from matplotlib import pyplot as plt
+
+
 from PIL import Image
 
 from object_detection.utils import ops as utils_ops
@@ -131,11 +135,12 @@ for image_path in TEST_IMAGE_PATHS:
       use_normalized_coordinates=True,
       line_thickness=1,
       max_boxes_to_draw=10,
-      min_score_thresh=.05
+      min_score_thresh=.6
       )
   plt.figure(figsize=IMAGE_SIZE)
   plt.imshow(image_np)
-  plt.show()
+  plt.savefig( image_path + '-result.png' )
+  
 
 
 

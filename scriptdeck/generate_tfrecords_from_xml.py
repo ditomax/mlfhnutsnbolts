@@ -55,6 +55,15 @@ FLAGS = flags.FLAGS
 SETS = ['train', 'val', 'trainval', 'test']
 
 
+
+nuts_count = 0
+bolts_count = 0
+washer_count = 0
+lockwasher_count = 0
+
+
+
+
 def dict_to_tf_example(data,
                        dataset_directory,
                        label_map_dict,
@@ -81,11 +90,31 @@ def dict_to_tf_example(data,
   Raises:
     ValueError: if the image pointed to by data['filename'] is not a valid JPEG
   """
+
+  global nuts_count, bolts_count, washer_count, lockwasher_count
+
+  
+  
+  
   #img_path = os.path.join(data['folder'], image_subdirectory, data['filename'])
   img_path = data['filename']
   full_path = os.path.join(dataset_directory, img_path)
+
+  # test if file exists
+  if not os.path.isfile(full_path):
+      
+    full_path = os.path.join(dataset_directory, img_path + '.jpg' )
+    if not os.path.isfile(full_path):
+      
+      print ('skipping invalid file {}'.format( full_path ))
+      return None
+  
   with tf.gfile.GFile(full_path, 'rb') as fid:
+    
     encoded_jpg = fid.read()
+    
+    
+    
   encoded_jpg_io = io.BytesIO(encoded_jpg)
   image = PIL.Image.open(encoded_jpg_io)
   if image.format != 'JPEG':
@@ -110,16 +139,38 @@ def dict_to_tf_example(data,
       if ignore_difficult_instances and difficult:
         continue
 
+      name= obj['name'] 
+      if not name in label_map_dict:
+        print ('skipping invalid key {}'.format( name ))
+        continue
+      
+
       difficult_obj.append(int(difficult))
 
       xmin.append(float(obj['bndbox']['xmin']) / width)
       ymin.append(float(obj['bndbox']['ymin']) / height)
       xmax.append(float(obj['bndbox']['xmax']) / width)
       ymax.append(float(obj['bndbox']['ymax']) / height)
+      
       classes_text.append(obj['name'].encode('utf8'))
       classes.append(label_map_dict[obj['name']])
       truncated.append(int(obj['truncated']))
       poses.append(obj['pose'].encode('utf8'))
+      
+      if obj['name'] == 'nut':
+          nuts_count+= 1
+      
+      if obj['name'] == 'bolt':
+          bolts_count+= 1
+      
+      if obj['name'] == 'washer':
+          washer_count+= 1
+      
+      if obj['name'] == 'lockwasher':
+          lockwasher_count+= 1
+      
+      
+      
 
   example = tf.train.Example(features=tf.train.Features(feature={
       'image/height': dataset_util.int64_feature(height),
@@ -148,6 +199,9 @@ def main(_):
     if FLAGS.set not in SETS:
         raise ValueError('set must be in : {}'.format(SETS))
 
+    global nuts_count, bolts_count, washer_count, lockwasher_count
+
+
     data_dir = FLAGS.data_dir
     examples_path = data_dir
     annotations_dir = data_dir
@@ -158,9 +212,10 @@ def main(_):
   
     examples_list = dataset_util.read_examples_list(examples_path)
   
+    file_count= 0
     for file in os.listdir(annotations_dir):
         if file.endswith(".xml"):
-        
+
             path = os.path.join(annotations_dir, file )
             with tf.gfile.GFile(path, 'r') as fid:
                 xml_str = fid.read()
@@ -168,9 +223,17 @@ def main(_):
             data = dataset_util.recursive_parse_xml_to_dict(xml)['annotation']
 
             tf_example = dict_to_tf_example(data, FLAGS.data_dir, label_map_dict, FLAGS.ignore_difficult_instances)
-            writer.write(tf_example.SerializeToString())
+            
+            if tf_example:
+                writer.write(tf_example.SerializeToString())
+                file_count+= 1
 
     writer.close()
+
+    print ('processed {} files with {} bolts {} nuts {} washers {} lock washers'.format( file_count, bolts_count, nuts_count, washer_count, lockwasher_count ))
+    
+
+
 
 
 if __name__ == '__main__':

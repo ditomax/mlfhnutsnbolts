@@ -35,8 +35,9 @@ def main(_):
 
 
     # What model to download.
-    MODEL_NAME = 'ssd_mobilenet_v1_coco_2017_11_17'
+    #MODEL_NAME = 'ssd_mobilenet_v1_coco_2017_11_17'
     #MODEL_NAME = 'ssd_mobilenet_v2_coco_2018_03_29'
+    MODEL_NAME = 'ssd_inception_v2_coco_2018_01_28'
     #MODEL_NAME = 'faster_rcnn_resnet101_coco_2018_01_28'
     #MODEL_NAME = 'faster_rcnn_inception_v2_coco_2018_01_28'
     #MODEL_NAME = 'ssdlite_mobilenet_v2_coco_2018_05_09'

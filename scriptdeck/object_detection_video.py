@@ -29,12 +29,14 @@ from object_detection.utils import visualization_utils as vis_util
 
 
 
+# # Model preparation 
 ROOT= os.path.join( expanduser("~"), 'deeplearning/stpoelten19' )
 MODEL='model1'
 MODEL_PATH = os.path.join ( ROOT, MODEL )
-MODEL_RESULT = MODEL_PATH + '-result'
+MODEL_RESULT = os.path.join ( MODEL_PATH, 'result' )
 PATH_TO_CKPT = os.path.join ( MODEL_RESULT,  'frozen_inference_graph.pb' )
 PATH_TO_LABELS = os.path.join ( MODEL_PATH, 'object-detection.pbtxt')
+TEST_PATH= os.path.join(ROOT,'ground_truth/test')
 NUM_CLASSES = 4
 
 
@@ -113,7 +115,7 @@ def run_inference_for_single_image(image, graph):
 while True:
   ret, image_np = cap.read()
 
-  image_np= cv2.resize(image_np, (300,300))
+  image_np= cv2.resize(image_np, (200,200))
 
   # the array based representation of the image will be used later in order to prepare the
   # result image with boxes and labels on it.
@@ -135,8 +137,8 @@ while True:
       instance_masks=output_dict.get('detection_masks'),
       use_normalized_coordinates=True,
       line_thickness=1,
-      max_boxes_to_draw=10,
-      min_score_thresh=.05
+      max_boxes_to_draw=5,
+      min_score_thresh=.5
       )
     
     

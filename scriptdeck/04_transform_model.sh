@@ -9,7 +9,7 @@ cd $MODELPATH
 
 
 # determine youngest model checkpoint
-VERSION=2000
+VERSION=2296
 #MC=$(ls -t $MO/model.ckpt* -I "*.meta" | cut -c 1-25 | head -1)
 MC=$MODELPATH/model.ckpt-$VERSION
 
